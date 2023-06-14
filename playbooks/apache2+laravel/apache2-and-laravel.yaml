@@ -1,7 +1,7 @@
 ---
 - name: Install and Deploy Apache2 with Laravel
   hosts: all
-  become: yes
+  become: root
 
   vars:
     laravel_project_name: app2
