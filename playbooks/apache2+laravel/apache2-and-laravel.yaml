@@ -13,6 +13,8 @@
       apt:
         name: apache2
         state: present
+      become_user: root
+      changed_when: false
 
     - name: Install PHP and required extensions
       apt:
