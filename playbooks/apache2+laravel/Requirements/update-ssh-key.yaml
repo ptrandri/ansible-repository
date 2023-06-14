@@ -1,9 +1,10 @@
----
-- hosts: all
+- name: Add SSH key to remote server
+  hosts: all
+  become: yes
 
-  become: true
   tasks:
-    - name: update apt packages
-      apt:
-        upgrade: yes
-        update_cache: yes
+    - name: Add SSH key to authorized_keys
+      authorized_key:
+        user: server
+        key: "{{ lookup('file', '/home/server/.ssh/id_rsa.pub') }}"
+        state: present

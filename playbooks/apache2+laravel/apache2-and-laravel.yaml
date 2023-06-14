@@ -80,7 +80,7 @@
 
     - name: Configure Apache2 virtual host
       template:
-        src: apache2_vhost.conf.j2
+        src: ./conf/apache2_vhost.conf.j2
         dest: /etc/apache2/sites-available/{{ laravel_project_name }}.conf
       notify: Restart Apache2
 
