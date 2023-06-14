@@ -51,14 +51,14 @@
         version: main
       become: yes
 
-    - name: Update Composer dependencies
-      command: composer update --no-dev
+    - name: Install Laravel dependencies
+      command: composer install --no-dev
       args:
         chdir: '{{ laravel_project_root }}'
       become: yes
 
-    - name: Install Laravel dependencies
-      command: composer install --no-dev
+    - name: Update Composer dependencies
+      command: composer update --no-dev
       args:
         chdir: '{{ laravel_project_root }}'
       become: yes
