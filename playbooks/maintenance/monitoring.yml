@@ -4,21 +4,21 @@
   become: true
   tasks:
     - name: Check CPU
-      command: "cat /proc/cpuinfo"
+      command: 'cat /proc/cpuinfo'
       register: cpu_output
 
     - name: Check RAM
-      command: "free -m"
+      command: 'free -m'
       register: ram_output
 
     - name: Check Disk
-      command: "df -h"
+      command: 'df -h'
       register: disk_output
 
     - name: Display Results
       debug:
         var: item.stdout_lines
       with_items:
-        - "{{ cpu_output }}"
-        - "{{ ram_output }}"
-        - "{{ disk_output }}"
+        - '{{ cpu_output }}'
+        - '{{ ram_output }}'
+        - '{{ disk_output }}'
