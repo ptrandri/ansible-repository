@@ -19,17 +19,17 @@
         state: directory
         mode: '0755'
 
-    - name: Download and install Docker GPG key
-      shell: >
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
-        gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-      args:
-        creates: /etc/apt/keyrings/docker.gpg
+    - name: Download Docker GPG key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.gpg
+      notify: Set permissions for GPG key
 
     - name: Set appropriate permissions for the GPG key
       file:
         path: /etc/apt/keyrings/docker.gpg
         mode: '0644'
+      when: "'/etc/apt/keyrings/docker.gpg' is file"
 
     - name: Add Docker repository to Apt sources
       lineinfile:
