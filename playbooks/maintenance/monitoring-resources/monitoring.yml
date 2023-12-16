@@ -1,7 +1,7 @@
 ---
-- name: Gather CPU RAM and Disk Space Usage
+- name: Acquire Ansible Semaphore
   hosts: all
-  gather_facts: yes
+  gather_facts: no
   tasks:
     - name: Acquire Ansible Semaphore
       command: 'ansible-semaphore-cli -id {{ inventory_hostname }} -l 60'
@@ -9,6 +9,10 @@
       poll: 0
       register: semaphore_result
 
+- name: Gather CPU RAM and Disk Space Usage
+  hosts: all
+  gather_facts: yes
+  tasks:
     - name: Wait for Semaphore
       async_status:
         jid: '{{ semaphore_result.ansible_job_id }}'
