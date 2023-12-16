@@ -62,3 +62,7 @@
     - name: Set permissions for GPG key
       debug:
         msg: "Setting permissions for the GPG key"
+
+    - name: Update apt cache
+      debug:
+        msg: "Updating apt cache"
