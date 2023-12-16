@@ -5,30 +5,28 @@
 
   tasks:
     - name: Add Docker's official GPG key
-      apt_key:
-        url: https://download.docker.com/linux/debian/gpg
-        state: present
-
-    - name: Install required packages
       apt:
-        name:
-          - ca-certificates
-          - curl
-          - gnupg
+        name: "{{ item }}"
         state: present
+      loop:
+        - ca-certificates
+        - curl
+        - gnupg
 
-    - name: Create keyrings directory
+    - name: Create directory for keyrings
       file:
         path: /etc/apt/keyrings
         state: directory
         mode: '0755'
 
-    - name: Download Docker GPG key and save to keyrings directory
-      command: 'curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg'
+    - name: Download and install Docker GPG key
+      shell: >
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+        gpg --dearmor -o /etc/apt/keyrings/docker.gpg
       args:
         creates: /etc/apt/keyrings/docker.gpg
 
-    - name: Set permissions for the Docker GPG key
+    - name: Set appropriate permissions for the GPG key
       file:
         path: /etc/apt/keyrings/docker.gpg
         mode: '0644'
@@ -36,10 +34,11 @@
     - name: Add Docker repository to Apt sources
       lineinfile:
         path: /etc/apt/sources.list.d/docker.list
-        line: 'deb [arch={{ dpkg_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_lsb.codename }} stable'
-        create: yes
+        line: |
+          deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+      notify: Update apt cache
 
-    - name: Update APT cache
+    - name: Update apt cache
       apt:
         update_cache: yes
 
@@ -50,5 +49,5 @@
           - docker-ce-cli
           - containerd.io
           - docker-buildx-plugin
-          - docker-compose
+          - docker-compose-plugin
         state: present
