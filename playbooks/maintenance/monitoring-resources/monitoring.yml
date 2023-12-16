@@ -1,38 +1,17 @@
 ---
-- name: Acquire Ansible Semaphore
-  hosts: all
-  gather_facts: no
-  tasks:
-    - name: Acquire Ansible Semaphore
-      command: 'ansible-semaphore-cli -id {{ inventory_hostname }} -l 60'
-      async: 120 # Timeout in seconds
-      poll: 0
-      register: semaphore_result
-
 - name: Gather CPU RAM and Disk Space Usage
   hosts: all
   gather_facts: yes
   tasks:
-    - name: Wait for Semaphore
-      async_status:
-        jid: '{{ semaphore_result.ansible_job_id }}'
-      register: job_result
-      until: job_result.finished
-      retries: 600 # Adjust retries based on your expected wait time
-      delay: 10
-
     - name: Gather CPU usage
       shell: top -bn1 | grep 'Cpu(s)' | awk '{print $2}'
       register: cpu_usage
-
     - name: Gather RAM Usage
       shell: top -bn1 | awk '/MiB Mem/ {printf "%.2f\n", $8/$4 * 100}'
       register: ram_usage
-
     - name: Gather Disk Space
       shell: "df -h --output=pcent / | awk 'NR==2 {print $1}'"
       register: disk_space
-
     - name: Usage Stats
       debug:
         msg:
@@ -40,6 +19,3 @@
           - 'CPU Usage: {{ cpu_usage.stdout }}%'
           - 'RAM Usage: {{ ram_usage.stdout }}%'
           - 'Disk Space Used: {{ disk_space.stdout }}'
-
-    - name: Release Ansible Semaphore
-      command: 'ansible-semaphore-cli -id {{ inventory_hostname }} -r'
