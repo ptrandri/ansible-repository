@@ -8,13 +8,14 @@
     - name: check disk space available
       shell: df -h / | awk 'NR==2 {print $5}'
       register: disk_usage
-    # - name: send discord message when disk space is over 80%
-    #   uri:
-    #     url: "your-webhook"
-    #     method: POST
-    #     body_format: json
-    #     body: '{"content": "Disk space on {{ inventory_hostname }} is above 80%!"}'
-    #     headers:
-    #       Content-Type: application/json
-    #     status_code: 204
-    #   when: disk_usage.stdout[:-1]|int > 80
+    - name: Send Disk Space Notification
+      uri:
+        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
+        method: POST
+        body_format: json
+        body:
+          chat_id: '1104775987'
+          text: |
+            Disk space usage on {{ inventory_hostname }} is {{ disk_space.stdout }}.
+        status_code: 200
+      delegate_to: localhost
