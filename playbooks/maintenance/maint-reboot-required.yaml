@@ -1,3 +1,4 @@
+---
 - name: check if system reboot is required
   hosts: all
   become: yes
@@ -10,16 +11,14 @@
     - debug:
         msg: 'Reboot is required'
       when: reboot_required.stat.exists
-      
-    - name: Send Reboot Required Notification
+    - name: Send reboot required notification to Telegram
       uri:
         url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
         method: POST
         body_format: json
         body:
           chat_id: '1104775987'
-          text: |
-            Reboot is required on {{ inventory_hostname }}.
+          text: 'Reboot required on {{ inventory_hostname }}'
         status_code: 200
       when: reboot_required.stat.exists
       delegate_to: localhost

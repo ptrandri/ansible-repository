@@ -8,7 +8,7 @@
     - name: check disk space available
       shell: df -h / | awk 'NR==2 {print $5}'
       register: disk_usage
-    - name: Send Disk Space Notification
+    - name: Send disk space notification to Telegram
       uri:
         url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
         method: POST
@@ -16,6 +16,7 @@
         body:
           chat_id: '1104775987'
           text: |
-            Disk space usage on {{ inventory_hostname }} is {{ disk_space.stdout }}.
+            Disk space check on {{ inventory_hostname }}
+            Disk Usage: {{ disk_usage.stdout }}
         status_code: 200
       delegate_to: localhost
