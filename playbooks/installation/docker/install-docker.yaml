@@ -1,8 +1,10 @@
 - name: Install Docker Engine on Ubuntu
+  gather_facts: no
   hosts: all
   become: true
   tasks:
     - name: Uninstall old versions
+      become: true
       apt:
         name:
           - docker
@@ -12,46 +14,48 @@
           - runc
         state: absent
         autoremove: true
-        become: true
 
     - name: Update all packages using the apt repository
+      become: true
       apt:
         update_cache: yes
         force_apt_get: yes
-        become: true
 
     - name: Upgrading all apt packages using apt
+      become: true
       apt:
         force_apt_get: yes
         upgrade: yes
-        become: true
 
     - name: Install packages
+      become: true
       apt:
         name:
           - ca-certificates
           - curl
           - gnupg
         state: present
-        become: true
 
     - name: Add Docker official GPG key
+      become: true
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
     - name: Add Docker Repository
+      become: true
       apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu jammy stable
         state: present
 
     - name: Update all packages using the apt repository
+      become: true
       apt:
         update_cache: yes
         force_apt_get: yes
-        become: true
 
     - name: Install Docker Engine
+      become: true
       apt:
         name:
           - docker-ce
@@ -59,5 +63,4 @@
           - containerd.io
           - docker-buildx-plugin
           - docker-compose-plugin
-          - docker-compose
         state: present
