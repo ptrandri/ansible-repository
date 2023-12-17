@@ -27,5 +27,5 @@
       ansible.builtin.copy:
         content: "{{ (summary | sort | join('\n')) + '\n' }}"
         dest: /tmp/connectivity_test.csv
-      delegate_to: aapwork
+      delegate_to: localhost
       run_once: true
