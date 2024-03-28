@@ -31,7 +31,7 @@
 
     - name: Create systemd service file for Node Exporter
       ansible.builtin.copy:
-        content:
+        content: |
           [Unit]
           Description=Node Exporter
           Wants=network-online.target
