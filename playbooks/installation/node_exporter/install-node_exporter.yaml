@@ -21,10 +21,6 @@
       args:
         executable: "/bin/bash"
 
-    - name: Start Node Exporter service
-      ansible.builtin.command:
-        cmd: "timeout 120s /usr/local/bin/node_exporter"
-
     - name: Create node_exporter user
       ansible.builtin.command:
         cmd: "useradd -rs /bin/false node_exporter"
