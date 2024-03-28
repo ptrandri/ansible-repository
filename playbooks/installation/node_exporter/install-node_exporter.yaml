@@ -23,7 +23,7 @@
 
     - name: Start Node Exporter service
       ansible.builtin.command:
-        cmd: "timeout 10s /usr/local/bin/node_exporter"
+        cmd: "timeout 120s /usr/local/bin/node_exporter"
 
     - name: Create node_exporter user
       ansible.builtin.command:
