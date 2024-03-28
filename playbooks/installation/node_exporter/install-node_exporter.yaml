@@ -18,7 +18,7 @@
 
     - name: Remove extracted directory
       ansible.builtin.command:
-        cmd: "sudo rm -r /tmp/node_exporter-1.7.0.linux-amd64*"
+        cmd: "sudo rm -r /tmp/node_exporter*"
 
     - name: Start Node Exporter service
       ansible.builtin.command:
