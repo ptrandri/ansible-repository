@@ -52,6 +52,10 @@
       ansible.builtin.command:
         cmd: "systemctl enable node_exporter"
 
-    - name: Reload systemd daemon and start Node Exporter service
+    - name: Reload systemd daemon
       ansible.builtin.command:
-        cmd: "systemctl daemon-reload && systemctl start node_exporter && systemctl status node_exporter"
+        cmd: "systemctl daemon-reload"
+
+    - name: Start Node Exporter service
+      ansible.builtin.command:
+        cmd: "systemctl start node_exporter"
