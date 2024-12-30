@@ -1,3 +1,4 @@
+---
 - name: Check and restart MySQL if down
   hosts: all
   become: yes
@@ -21,29 +22,30 @@
 
     - name: Send notification to Telegram if MySQL was down
       uri:
-        url: "https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage"
+        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
         method: POST
         body_format: json
         body:
           chat_id: "-1002431095379"
-          text: >-
-            MySQL service was found down and has been restarted on {{ inventory_hostname }}.
+          text: |
+            Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
+            Host: {{ inventory_hostname }}
+            Status: MySQL service was down and has been restarted.
         status_code: 200
       when: mysql_status.stdout != "active"
       delegate_to: localhost
-      run_once: true
-      become: false
 
     - name: Send notification to Telegram if MySQL is running
       uri:
-        url: "https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage"
+        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
         method: POST
         body_format: json
         body:
           chat_id: "-1002431095379"
-          text: >-
-            MySQL service is running normally on {{ inventory_hostname }}.
+          text: |
+            Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
+            Host: {{ inventory_hostname }}
+            Status: MySQL service is running normally. No action required.
         status_code: 200
       when: mysql_status.stdout == "active"
       delegate_to: localhost
-      become: false

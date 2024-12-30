@@ -1,51 +1,40 @@
 ---
-- name: Check and restart MySQL if down
+- name: Gather CPU RAM and Disk Space Usage
   hosts: all
-  become: yes
+  gather_facts: yes
   tasks:
-    - name: Check if MySQL service is running
-      become: true
-      shell: "systemctl is-active mysql"
-      register: mysql_status
-      failed_when: false
+    - name: Gather CPU usage
+      shell: top -bn1 | grep 'Cpu(s)' | awk '{print $2}'
+      register: cpu_usage
+      
+    - name: Gather RAM Usage
+      shell: top -bn1 | awk '/MiB Mem/ {printf "%.2f\n", $8/$4 * 100}'
+      register: ram_usage
 
-    - name: Debug MySQL status
+    - name: Gather Disk Space
+      shell: "df -h --output=pcent / | awk 'NR==2 {print $1}'"
+      register: disk_space
+
+    - name: Usage Stats
       debug:
-        msg: "MySQL status: {{ mysql_status.stdout }}"
+        msg:
+          - 'Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}'
+          - 'CPU Usage: {{ cpu_usage.stdout }}%'
+          - 'RAM Usage: {{ ram_usage.stdout }}%'
+          - 'Disk Space Used: {{ disk_space.stdout }}'
 
-    - name: Restart MySQL service if down
-      become: true
-      service:
-        name: mysql
-        state: restarted
-      when: mysql_status.stdout != "active"
-
-    - name: Send notification to Telegram if MySQL was down
+    - name: Send to Telegram
       uri:
         url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
         method: POST
         body_format: json
         body:
-          chat_id: "-1002431095379"
+          chat_id: '-1002431095379'
           text: |
             Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
             Host: {{ inventory_hostname }}
-            Status: MySQL service was down and has been restarted.
+            CPU Usage: {{ cpu_usage.stdout }}%
+            RAM Usage: {{ ram_usage.stdout }}%
+            Disk Space Used: {{ disk_space.stdout }}
         status_code: 200
-      when: mysql_status.stdout != "active"
-      delegate_to: localhost
-
-    - name: Send notification to Telegram if MySQL is running
-      uri:
-        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
-        method: POST
-        body_format: json
-        body:
-          chat_id: "-1002431095379"
-          text: |
-            Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
-            Host: {{ inventory_hostname }}
-            Status: MySQL service is running normally. No action required.
-        status_code: 200
-      when: mysql_status.stdout == "active"
       delegate_to: localhost
