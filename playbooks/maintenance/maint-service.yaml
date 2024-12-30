@@ -34,7 +34,7 @@
       run_once: true
 
     - name: Send notification to Telegram if MySQL is running
-      uri:
+      ansible.builtin.uri:
         url: "https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage"
         method: POST
         body_format: json
@@ -42,7 +42,8 @@
           chat_id: "-1002431095379"
           text: >-
             MySQL service is running normally on {{ inventory_hostname }}.
-        status_code: 200
+        headers:
+          Content-Type: "application/json"
       when: mysql_status.stdout == "active"
       delegate_to: localhost
       run_once: true
