@@ -1,40 +1,43 @@
----
-- name: Gather CPU RAM and Disk Space Usage
+- name: Gather CPU, RAM, and Disk Space Usage
   hosts: all
   gather_facts: yes
   tasks:
     - name: Gather CPU usage
       shell: top -bn1 | grep 'Cpu(s)' | awk '{print $2}'
       register: cpu_usage
-      
+      failed_when: false
+
     - name: Gather RAM Usage
-      shell: top -bn1 | awk '/MiB Mem/ {printf "%.2f\n", $8/$4 * 100}'
+      shell: free | awk '/Mem/ {printf "%.2f", $3/$2 * 100}'
       register: ram_usage
+      failed_when: false
 
     - name: Gather Disk Space
-      shell: "df -h --output=pcent / | awk 'NR==2 {print $1}'"
+      shell: "df -h --output=pcent / | awk 'NR==2 {print $1}' | tr -d '%'"
       register: disk_space
+      failed_when: false
 
     - name: Usage Stats
       debug:
         msg:
           - 'Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}'
+          - 'Host: {{ ansible_hostname }} ({{ inventory_hostname }})'
           - 'CPU Usage: {{ cpu_usage.stdout }}%'
           - 'RAM Usage: {{ ram_usage.stdout }}%'
-          - 'Disk Space Used: {{ disk_space.stdout }}'
+          - 'Disk Space Used: {{ disk_space.stdout }}%'
 
     - name: Send to Telegram
       uri:
-        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
+        url: 'https://api.telegram.org/botxxx/sendMessage'
         method: POST
         body_format: json
         body:
           chat_id: '-1002431095379'
           text: |
             Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
-            Host: {{ inventory_hostname }}
+            Host: {{ ansible_hostname }} ({{ inventory_hostname }})
             CPU Usage: {{ cpu_usage.stdout }}%
             RAM Usage: {{ ram_usage.stdout }}%
-            Disk Space Used: {{ disk_space.stdout }}
+            Disk Space Used: {{ disk_space.stdout }}%
         status_code: 200
       delegate_to: localhost
