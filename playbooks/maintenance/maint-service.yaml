@@ -40,7 +40,7 @@
         method: POST
         body_format: json
         body:
-          chat_id: "1104775987"
+          chat_id: "-1002431095379"
           text: >-
             MySQL service is running normally on {{ inventory_hostname }}.
         status_code: 200
