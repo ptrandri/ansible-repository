@@ -29,7 +29,8 @@
           chat_id: "-1002431095379"
           text: |
             Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
-            Host: {{ ansible_hostname }} ({{ inventory_hostname }})
+            Hostname: {{ ansible_hostname }} 
+            HostIP: {{ inventory_hostname }}
             Status: MySQL service was down and has been restarted.
         status_code: 200
       when: mysql_status.stdout != "active"
@@ -45,7 +46,8 @@
           chat_id: "-1002431095379"
           text: |
             Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
-            Host: {{ ansible_hostname }} ({{ inventory_hostname }})
+            Hostname: {{ ansible_hostname }} 
+            HostIP: {{ inventory_hostname }}
             Status: MySQL service is running normally. No action required.
         status_code: 200
       when: mysql_status.stdout == "active"

@@ -35,7 +35,8 @@
           chat_id: '-1002431095379'
           text: |
             Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
-            Host: {{ ansible_hostname }} ({{ inventory_hostname }})
+            HostIP: {{ ansible_hostname }} 
+            Hostname: {{ inventory_hostname }}
             CPU Usage: {{ cpu_usage.stdout }}%
             RAM Usage: {{ ram_usage.stdout }}%
             Disk Space Used: {{ disk_space.stdout }}%
