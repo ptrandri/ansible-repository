@@ -1,0 +1,46 @@
+- name: Check and restart MySQL if down
+  hosts: all
+  become: yes
+  tasks:
+    - name: Check if MySQL service is running
+      become: true
+      shell: "systemctl is-active mysql"
+      register: mysql_status
+      failed_when: false
+
+    - name: Debug MySQL status
+      debug:
+        msg: "MySQL status: {{ mysql_status.stdout }}"
+
+    - name: Restart MySQL service if down
+      become: true
+      service:
+        name: mysql
+        state: restarted
+      when: mysql_status.stdout != "active"
+
+    - name: Send notification to Telegram if MySQL was down
+      uri:
+        url: "https://api.telegram.org/botxxxx/sendMessage"
+        method: POST
+        body_format: json
+        body:
+          chat_id: "1104775987"
+          text: >-
+            MySQL service was found down and has been restarted on {{ inventory_hostname }}.
+        status_code: 200
+      when: mysql_status.stdout != "active"
+      delegate_to: localhost
+
+    - name: Send notification to Telegram if MySQL is running
+      uri:
+        url: "https://api.telegram.org/botxxxx/sendMessage"
+        method: POST
+        body_format: json
+        body:
+          chat_id: "1104775987"
+          text: >-
+            MySQL service is running normally on {{ inventory_hostname }}.
+        status_code: 200
+      when: mysql_status.stdout == "active"
+      delegate_to: localhost
