@@ -32,6 +32,8 @@
       when: mysql_status.stdout != "active"
       delegate_to: localhost
       run_once: true
+      become: false  # Tambahkan ini
+
 
     - name: Send notification to Telegram if MySQL is running
       ansible.builtin.uri:
@@ -46,4 +48,4 @@
           Content-Type: "application/json"
       when: mysql_status.stdout == "active"
       delegate_to: localhost
-      run_once: true
+      become: false  # Tambahkan ini
