@@ -34,6 +34,8 @@
         status_code: 200
       when: mysql_status.stdout != "active"
       delegate_to: localhost
+      become: false
+
 
     - name: Send notification to Telegram if MySQL is running
       uri:
@@ -49,3 +51,4 @@
         status_code: 200
       when: mysql_status.stdout == "active"
       delegate_to: localhost
+      become: false
