@@ -1,0 +1,55 @@
+- name: Check and restart nginx if down
+  hosts: all
+  become: yes
+  tasks:
+    - name: Gather host facts
+      setup:
+
+    - name: Check if nginx service is running
+      shell: "systemctl is-active nginx"
+      register: nginx_status
+      failed_when: false
+
+    - name: Debug nginx status
+      debug:
+        msg: "nginx status: {{ nginx_status.stdout }}"
+
+    - name: Restart nginx service if down
+      service:
+        name: nginx
+        state: restarted
+      when: nginx_status.stdout != "active"
+
+    - name: Send notification to Telegram if nginx was down
+      uri:
+        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
+        method: POST
+        body_format: json
+        body:
+          chat_id: "-1002431095379"
+          text: |
+            Executed On: {{ ansible_date_time | strftime("%Y-%m-%d %H:%M:%S") }}
+            Hostname: {{ ansible_hostname }}
+            HostIP: {{ inventory_hostname }}
+            Status: nginx service was down and has been restarted.
+        status_code: 200
+      when: nginx_status.stdout != "active"
+      delegate_to: localhost
+      become: false
+
+    - name: Send notification to Telegram if nginx is running
+      uri:
+        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
+        method: POST
+        body_format: json
+        body:
+          chat_id: "-1002431095379"
+          text: |
+            Executed On: {{ ansible_date_time | strftime("%Y-%m-%d %H:%M:%S") }}
+            Hostname: {{ ansible_hostname }}
+            HostIP: {{ inventory_hostname }}
+            Status: nginx service is running normally. No action required.
+        status_code: 200
+      when: nginx_status.stdout == "active"
+      delegate_to: localhost
+      become: false

@@ -1,0 +1,55 @@
+- name: Check and restart apache2 if down
+  hosts: all
+  become: yes
+  tasks:
+    - name: Gather host facts
+      setup:
+
+    - name: Check if apache2 service is running
+      shell: "systemctl is-active apache2"
+      register: apache2_status
+      failed_when: false
+
+    - name: Debug apache2 status
+      debug:
+        msg: "apache2 status: {{ apache2_status.stdout }}"
+
+    - name: Restart apache2 service if down
+      service:
+        name: apache2
+        state: restarted
+      when: apache2_status.stdout != "active"
+
+    - name: Send notification to Telegram if apache2 was down
+      uri:
+        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
+        method: POST
+        body_format: json
+        body:
+          chat_id: "-1002431095379"
+          text: |
+            Executed On: {{ ansible_date_time | strftime("%Y-%m-%d %H:%M:%S") }}
+            Hostname: {{ ansible_hostname }} 
+            HostIP: {{ inventory_hostname }}
+            Status: Apache2 service was down and has been restarted.
+        status_code: 200
+      when: apache2_status.stdout != "active"
+      delegate_to: localhost
+      become: false
+
+    - name: Send notification to Telegram if apache2 is running
+      uri:
+        url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
+        method: POST
+        body_format: json
+        body:
+          chat_id: "-1002431095379"
+          text: |
+            Executed On: {{ ansible_date_time | strftime("%Y-%m-%d %H:%M:%S") }}
+            Hostname: {{ ansible_hostname }} 
+            HostIP: {{ inventory_hostname }}
+            Status: Apache2 service is running normally. No action required.
+        status_code: 200
+      when: apache2_status.stdout == "active"
+      delegate_to: localhost
+      become: false
