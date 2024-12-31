@@ -11,6 +11,7 @@
     - debug:
         msg: 'Reboot is required'
       when: reboot_required.stat.exists
+      
     - name: Send reboot required notification to Telegram
       uri:
         url: 'https://api.telegram.org/bot6167093497:AAFHVoxKksDFktFJ5cd2X91lmSPbMG6p0MI/sendMessage'
