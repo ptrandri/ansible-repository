@@ -28,7 +28,7 @@
         body:
           chat_id: "-1002431095379"
           text: |
-            Executed On: {{ ansible_date_time | strftime("%Y-%m-%d %H:%M:%S") }}
+            Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
             Hostname: {{ ansible_hostname }} 
             HostIP: {{ inventory_hostname }}
             Status: Apache2 service was down and has been restarted.
@@ -45,7 +45,7 @@
         body:
           chat_id: "-1002431095379"
           text: |
-            Executed On: {{ ansible_date_time | strftime("%Y-%m-%d %H:%M:%S") }}
+            Executed On: {{ ansible_date_time.date }} {{ ansible_date_time.hour }}:{{ ansible_date_time.minute }}
             Hostname: {{ ansible_hostname }} 
             HostIP: {{ inventory_hostname }}
             Status: Apache2 service is running normally. No action required.
